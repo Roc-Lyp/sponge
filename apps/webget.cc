@@ -22,6 +22,7 @@ void get_URL(const string &host, const string &path) {
     sock.write(order);
 
     string recvline = "";
+    // 如果远端管道还未关闭
     while(!sock.eof()){
         recvline = sock.read();
         cout << recvline;
