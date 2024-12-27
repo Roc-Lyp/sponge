@@ -12,7 +12,7 @@
 class StreamReassembler {
   private:
     // Your code here -- add private members as necessary.
-    std::map<size_t, std::string> _unassemble_strs;   // 使用map，用于存储未组装的字节流片段，通过索引排序
+    std::map<size_t, std::string> _unassemble_strs;   // 用于存储未组装的字节流片段，通过索引排序
     size_t _next_assembled_idx;                       // 记录下一个要组装的字节索引，确保字节按顺序组装
     size_t _unassembled_bytes_num;                    // 记录尚未组装的字节数量，确保不超过容量
     size_t _eof_idx;                                  // eof索引
@@ -35,6 +35,10 @@ class StreamReassembler {
     //! \param index indicates the index (place in sequence) of the first byte in `data`
     //! \param eof the last byte of `data` will be the last byte in the entire stream
     void push_substring(const std::string &data, const uint64_t index, const bool eof);
+
+    void process_data(const std::string &data, const size_t index, const bool eof);
+
+    void assemble_unassembled_data();
 
     //! \name Access the reassembled byte stream
     //!@{
