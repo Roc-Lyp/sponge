@@ -19,7 +19,12 @@ using namespace std;
 //这里相当于是python中的实例化类，并且在:后进行成员初始化列表init(),该列表的内容是在byte_stream.cc中private下的成员
 //size_t 是一个无符号整数类型，通常用于表示对象的大小或数组的索引
 ByteStream::ByteStream(const size_t capacity): 
-    _queue(),_capacity_size(capacity),_written_size(0),_read_size(0),_end_input(false),_error(false) {}
+    _queue(),
+    _capacity_size(capacity),
+    _written_size(0),
+    _read_size(0),
+    _end_input(false),
+    _error(false) {}
 
 size_t ByteStream::write(const string &data) {
     /*
@@ -40,6 +45,15 @@ size_t ByteStream::write(const string &data) {
 
     return write_size;
 }
+
+bool ByteStream::write_char(char datum) {
+    if (input_ended() || remaining_capacity() == 0)
+        return false;
+    _queue.push_back(datum);
+    _written_size++;
+    return true;
+}
+
 
 //! \param[in] len bytes will be copied from the output side of the buffer
 //这里的const出现在方法声明末尾，说明该成员函数不会修改类的任何成员变量，意味着peek_output函数是一个常量成员函数
