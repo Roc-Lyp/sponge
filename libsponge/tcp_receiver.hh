@@ -14,21 +14,28 @@
 //! the acknowledgment number and window size to advertise back to the
 //! remote TCPSender.
 class TCPReceiver {
-    WrappingInt32 _isn;
-    bool _set_syn_flag;
-
     //! Our data structure for re-assembling bytes.
-    StreamReassembler _reassembler;
-
+    StreamReassembler reassembler_;
     //! The maximum number of bytes we'll store.
-    size_t _capacity;
+    size_t capacity_;
+    // The absolute seqno
+    uint64_t seqno_;
+    // The initial sequence nummber
+    std::optional<WrappingInt32> isn_;
+    // The Fin seqno
+    std::optional<uint64_t> fin_seq_;
 
   public:
     //! \brief Construct a TCP receiver
     //!
     //! \param capacity the maximum number of bytes that the receiver will
     //!                 store in its buffers at any give time.
-    TCPReceiver(const size_t capacity) : _isn(0), _set_syn_flag(false), _reassembler(capacity), _capacity(capacity) {}
+    TCPReceiver(const size_t capacity)
+        : reassembler_(capacity),
+          capacity_(capacity),
+          seqno_(0),
+          isn_(),
+          fin_seq_() {}
 
     //! \name Accessors to provide feedback to the remote TCPSender
     //!@{
@@ -54,15 +61,15 @@ class TCPReceiver {
     //!@}
 
     //! \brief number of bytes stored but not yet reassembled
-    size_t unassembled_bytes() const { return _reassembler.unassembled_bytes(); }
+    size_t unassembled_bytes() const { return reassembler_.unassembled_bytes(); }
 
     //! \brief handle an inbound segment
     void segment_received(const TCPSegment &seg);
 
     //! \name "Output" interface for the reader
     //!@{
-    ByteStream &stream_out() { return _reassembler.stream_out(); }
-    const ByteStream &stream_out() const { return _reassembler.stream_out(); }
+    ByteStream &stream_out() { return reassembler_.stream_out(); }
+    const ByteStream &stream_out() const { return reassembler_.stream_out(); }
     //!@}
 };
 
