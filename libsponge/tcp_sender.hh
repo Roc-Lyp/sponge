@@ -18,30 +18,48 @@
 //! segments if the retransmission timer expires.
 class TCPSender {
   private:
+    // 重传计数器超时时间 RTO 
     int _timeout{-1};
+
+    // 重传计数器 -- 记录当前距离重传计时器启动已经过了多久或者距离上一个package被重传过了多久
     int _timecount{0};
 
+    // 记录已经发送但是还没有确认的TCP报文段及其起始序列号---该集合是有序的
     std::map<size_t, TCPSegment> _outgoing_map{};
+
+    // 记录已经发送但是还没有确认的字节数量
     size_t _outgoing_bytes{0};
 
+    // 记录接收端上一次传回来的窗口大小
     size_t _last_window_size{1};
+
+    // 是否设置SYN标志
     bool _set_syn_flag{false};
+
+    // 是否设置FIN标志
     bool _set_fin_flag{false};
+    
+    // 连续重传计数
     size_t _consecutive_retransmissions_count{0};
 
     //! our initial sequence number, the number for our SYN.
+    // 初始序列号
     WrappingInt32 _isn;
 
     //! outbound queue of segments that the TCPSender wants sent
+    // 将需要发送的TCP数据报塞入这个队列即可发送出去
     std::queue<TCPSegment> _segments_out{};
 
     //! retransmission timer for the connection
+    // 重传计时器初始的重传时间
     unsigned int _initial_retransmission_timeout;
 
     //! outgoing stream of bytes that have not yet been sent
+    // 等待被发送的字节流
     ByteStream _stream;
 
     //! the (absolute) sequence number for the next byte to be sent
+    // 下一个发送的字节对应的序列号
     uint64_t _next_seqno{0};
 
   public:

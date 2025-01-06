@@ -10,6 +10,7 @@
 class TCPSegment {
   private:
     TCPHeader _header{};
+    // Buffer就是对String字符串相关操作的封装
     Buffer _payload{};
 
   public:
