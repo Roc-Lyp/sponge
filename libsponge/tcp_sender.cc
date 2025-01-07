@@ -143,6 +143,7 @@ void TCPSender::tick(const size_t ms_since_last_tick) {
     }
 }
 
+// 返回重传次数
 unsigned int TCPSender::consecutive_retransmissions() const { return _consecutive_retransmissions_count; }
 
 void TCPSender::send_empty_segment() {

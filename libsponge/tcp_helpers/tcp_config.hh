@@ -11,14 +11,19 @@
 //! Config for TCP sender and receiver
 class TCPConfig {
   public:
+    // 发送器和接收器缓冲区的默认容量。缓冲区容量指的是在给定时间内可以存储的最大数据量
     static constexpr size_t DEFAULT_CAPACITY = 64000;  //!< Default capacity
+    // tcp数据报中payload部分最大容量限制
     static constexpr size_t MAX_PAYLOAD_SIZE = 1000;   //!< Conservative max payload size for real Internet
+    // 默认超时时间
     static constexpr uint16_t TIMEOUT_DFLT = 1000;     //!< Default re-transmit timeout is 1 second
+    // 数据包在放弃之前允许的最大重传次数。如果发送器在经过指定的重传尝试次数后仍未收到确认，它会认为连接不可靠并采取适当的措施
     static constexpr unsigned MAX_RETX_ATTEMPTS = 8;   //!< Maximum re-transmit attempts before giving up
 
     uint16_t rt_timeout = TIMEOUT_DFLT;       //!< Initial value of the retransmission timeout, in milliseconds
     size_t recv_capacity = DEFAULT_CAPACITY;  //!< Receive capacity, in bytes
     size_t send_capacity = DEFAULT_CAPACITY;  //!< Sender capacity, in bytes
+    // 初始序列号,如果没有设置,那么会采用随机值策略
     std::optional<WrappingInt32> fixed_isn{};
 };
 

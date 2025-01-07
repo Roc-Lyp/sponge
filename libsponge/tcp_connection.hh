@@ -9,19 +9,27 @@
 //! \brief A complete endpoint of a TCP connection
 class TCPConnection {
   private:
+    // 配置信息
     TCPConfig _cfg;
+    // 初始化 tcp 接受端和发送端
     TCPReceiver _receiver{_cfg.recv_capacity};
     TCPSender _sender{_cfg.send_capacity, _cfg.rt_timeout, _cfg.fixed_isn};
 
     //! outbound queue of segments that the TCPConnection wants sent
+    // 数据包队列,用于存放希望发送出去的TCP数据报
     std::queue<TCPSegment> _segments_out{};
 
     //! Should the TCPConnection stay active (and keep ACKing)
     //! for 10 * _cfg.rt_timeout milliseconds after both streams have ended,
     //! in case the remote TCPConnection doesn't know we've received its whole stream?
+    // 主动发起TCP连接断开的一方,是否需要在FIN_WAIT_2状态后,等待2MSL会,防止自己发出的ACK超时或丢失,导致另一方不断重传FIN
+    // 该值在TCP连接建立时被设置为true,在本次TCP连接销毁时被设置为false
     bool _linger_after_streams_finish{true};
 
+    // 记录距离最后一次接受到TCP数据报过了多久
     size_t _time_since_last_segment_received_ms{0};
+
+    // 记录是否存活
     bool _is_active{true};
 
     void _set_rst_state(bool send_rst);

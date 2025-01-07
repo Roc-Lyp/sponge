@@ -14,6 +14,7 @@ string TCPState::name() const {
            ", linger_after_streams_finish=" + to_string(_linger_after_streams_finish);
 }
 
+// 每个状态由一组接收器和发送器状态组成
 TCPState::TCPState(const TCPState::State state) {
     switch (state) {
         case TCPState::State::LISTEN:
@@ -79,6 +80,7 @@ TCPState::TCPState(const TCPSender &sender, const TCPReceiver &receiver, const b
     , _active(active)
     , _linger_after_streams_finish(active ? linger : false) {}
 
+// 判断接收端当前处于什么状态
 string TCPState::state_summary(const TCPReceiver &receiver) {
     if (receiver.stream_out().error()) {
         return TCPReceiverStateSummary::ERROR;
@@ -91,6 +93,7 @@ string TCPState::state_summary(const TCPReceiver &receiver) {
     }
 }
 
+// 判断发送端当前处于什么状态
 string TCPState::state_summary(const TCPSender &sender) {
     if (sender.stream_in().error()) {
         return TCPSenderStateSummary::ERROR;

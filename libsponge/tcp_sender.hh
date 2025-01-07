@@ -38,7 +38,7 @@ class TCPSender {
 
     // 是否设置FIN标志
     bool _set_fin_flag{false};
-    
+
     // 连续重传计数
     size_t _consecutive_retransmissions_count{0};
 
@@ -105,6 +105,7 @@ class TCPSender {
     //! \note These must be dequeued and sent by the TCPConnection,
     //! which will need to fill in the fields that are set by the TCPReceiver
     //! (ackno and window size) before sending.
+    // 成员函数
     std::queue<TCPSegment> &segments_out() { return _segments_out; }
     //!@}
 
