@@ -33,7 +33,7 @@
 //! and learns or replies as necessary.
 class NetworkInterface {
   private:
-    //! ARP 条目
+    //! ARP 条目, 该结构体包括，EthernetAddress类型的以太网地址和存活时间ttl
     struct ARP_Entry {
         EthernetAddress eth_addr;
         size_t ttl;
@@ -52,12 +52,16 @@ class NetworkInterface {
     std::list<std::pair<Address, InternetDatagram>> _waiting_arp_internet_datagrams{};
 
     //! Ethernet (known as hardware, network-access-layer, or link-layer) address of the interface
+    // 当前虚拟网卡的MAC地址
     EthernetAddress _ethernet_address;
 
     //! IP (known as internet-layer or network-layer) address of the interface
+    // 自己的IP地址
     Address _ip_address;
 
     //! outbound queue of Ethernet frames that the NetworkInterface wants sent
+    // 生产者消费者之间解耦用的队列 -- cs144实现通用套路
+    // 网络适配器只需要把组装好的以太网帧丢入这个队列即可
     std::queue<EthernetFrame> _frames_out{};
 
   public:

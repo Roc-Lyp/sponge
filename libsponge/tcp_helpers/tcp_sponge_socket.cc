@@ -208,12 +208,13 @@ void TCPSpongeSocket<AdaptT>::connect(const TCPConfig &c_tcp, const FdAdapterCon
     if (_tcp) {
         throw runtime_error("connect() with TCPConnection already initialized");
     }
-
+    // 初始化TCP连接和事件循环
     _initialize_TCP(c_tcp);
 
     _datagram_adapter.config_mut() = c_ad;
 
     cerr << "DEBUG: Connecting to " << c_ad.destination.to_string() << "...\n";
+    // 开始三次握手,首先由Client发出一个SYN包
     _tcp->connect();
 
     const TCPState expected_state = TCPState::State::SYN_SENT;
@@ -222,10 +223,10 @@ void TCPSpongeSocket<AdaptT>::connect(const TCPConfig &c_tcp, const FdAdapterCon
         throw runtime_error("After TCPConnection::connect(), state was " + _tcp->state().name() + " but expected " +
                             expected_state.name());
     }
-
+    // 使用事件循环,等待三次连接建立完毕
     _tcp_loop([&] { return _tcp->state() == TCPState::State::SYN_SENT; });
     cerr << "Successfully connected to " << c_ad.destination.to_string() << ".\n";
-
+    // 单独开启一个线程用于后续数据传输 
     _tcp_thread = thread(&TCPSpongeSocket::_tcp_main, this);
 }
 

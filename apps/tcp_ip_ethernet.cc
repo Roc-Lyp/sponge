@@ -117,13 +117,21 @@ int main(int argc, char **argv) {
         }
 
         // choose a random local Ethernet address (and make sure it's private, i.e. not owned by a manufacturer)
+        // 随机选一个mac地址
         EthernetAddress local_ethernet_address;
         for (auto &byte : local_ethernet_address) {
             byte = random_device()();  // use a random local Ethernet address
         }
+        /*
+            at(0) |= 0x02：设置第一个字节的倒数第二位为 1，表示是本地管理地址（Local Administered Address）。
+            at(0) &= 0xfe：确保第一个字节的最后一位为 0，表示非组播地址（Unicast Address）。
+        */
+        // 设置为本地以太网地址
         local_ethernet_address.at(0) |= 0x02;  // "10" in last two binary digits marks a private Ethernet address
+        // 确保是私有地址
         local_ethernet_address.at(0) &= 0xfe;
 
+        // 返回的一个元组
         auto [c_fsm, c_filt, next_hop, tap_dev_name] = get_config(argc, argv);
 
         TCPOverIPv4OverEthernetSpongeSocket tcp_socket(TCPOverIPv4OverEthernetAdapter(

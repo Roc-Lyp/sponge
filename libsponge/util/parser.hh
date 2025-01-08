@@ -22,6 +22,7 @@ enum class ParseResult {
 //! Output a string representation of a ParseResult
 std::string as_string(const ParseResult r);
 
+// 从数据流中解析字段（如整数）并记录解析状态
 class NetParser {
   private:
     Buffer _buffer;
@@ -62,6 +63,7 @@ class NetParser {
     void remove_prefix(const size_t n);
 };
 
+// 将数据转换为字节流格式，序列化为网络字节序
 struct NetUnparser {
     template <typename T>
     static void _unparse_int(std::string &s, T val);

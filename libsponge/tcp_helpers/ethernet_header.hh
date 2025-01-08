@@ -15,6 +15,7 @@ constexpr EthernetAddress ETHERNET_BROADCAST = {0xff, 0xff, 0xff, 0xff, 0xff, 0x
 std::string to_string(const EthernetAddress address);
 
 //! \brief Ethernet frame header
+// 处理以太网帧头部数据，包括解析，序列化和转换为字符串
 struct EthernetHeader {
     static constexpr size_t LENGTH = 14;          //!< Ethernet header length in bytes
     static constexpr uint16_t TYPE_IPv4 = 0x800;  //!< Type number for [IPv4](\ref rfc::rfc791)
