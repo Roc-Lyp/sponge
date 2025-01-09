@@ -19,17 +19,21 @@ TCPOverIPv4OverEthernetAdapter::TCPOverIPv4OverEthernetAdapter(TapFD &&tap,
 optional<TCPSegment> TCPOverIPv4OverEthernetAdapter::read() {
     // Read Ethernet frame from the raw device
     EthernetFrame frame;
+    // 从tap设备读取数据,并解析为以太网帧
     if (frame.parse(_tap.read()) != ParseResult::NoError) {
         return {};
     }
 
     // Give the frame to the NetworkInterface. Get back an Internet datagram if frame was carrying one.
+    // 从以太网帧中提取IPV4数据报 -- NetworkInterface的recv_frame方法,lab5实现的
     optional<InternetDatagram> ip_dgram = _interface.recv_frame(frame);
 
     // The incoming frame may have caused the NetworkInterface to send a frame.
+    // 将NetworkInterface输出队列中待发送的数据包取出并写入tap设备,即发送出去
     send_pending();
 
     // Try to interpret IPv4 datagram as TCP
+    // 从ip数据报中提取tcp segment返回
     if (ip_dgram) {
         return unwrap_tcp_in_ip(ip_dgram.value());
     }

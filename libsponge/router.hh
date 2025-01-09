@@ -12,6 +12,7 @@
 //! later retrieval. Otherwise, behaves identically to the underlying
 //! implementation of NetworkInterface.
 class AsyncNetworkInterface : public NetworkInterface {
+    // AsyncNetworkInterface 将接收到的数据报保存在队列中，而不是立即返回给调用者，以便稍后检索
     std::queue<InternetDatagram> _datagrams_out{};
 
   public:
@@ -28,6 +29,7 @@ class AsyncNetworkInterface : public NetworkInterface {
     //!
     //! \param[in] frame the incoming Ethernet frame
     void recv_frame(const EthernetFrame &frame) {
+        // 只会将IPV4数据报放入数据报接收队列中
         auto optional_dgram = NetworkInterface::recv_frame(frame);
         if (optional_dgram.has_value()) {
             _datagrams_out.push(std::move(optional_dgram.value()));
@@ -40,20 +42,24 @@ class AsyncNetworkInterface : public NetworkInterface {
 
 //! \brief A router that has multiple network interfaces and
 //! performs longest-prefix-match routing between them.
+// 需实现一下 IP 最长匹配并将数据包转发即可
 class Router {
     //! The router's collection of network interfaces
+    // 路由器的网络接口集合
     std::vector<AsyncNetworkInterface> _interfaces{};
 
     //! Send a single datagram from the appropriate outbound interface to the next hop,
     //! as specified by the route with the longest prefix_length that matches the
     //! datagram's destination address.
+    // 路由一个数据报
     void route_one_datagram(InternetDatagram &dgram);
 
+    // 路由表的条目
     struct RouterTableEntry {
-        const uint32_t route_prefix;
-        const uint8_t prefix_length;
-        const std::optional<Address> next_hop;
-        const size_t interface_idx;
+        const uint32_t route_prefix;            // 目标网络的前缀
+        const uint8_t prefix_length;            // 子网掩码长度
+        const std::optional<Address> next_hop;  // 下一条地址，可选
+        const size_t interface_idx;             // 负责转发数据的接口编号
     };
     std::vector<RouterTableEntry> _router_table{};
 
@@ -61,6 +67,7 @@ class Router {
     //! Add an interface to the router
     //! \param[in] interface an already-constructed network interface
     //! \returns The index of the interface after it has been added to the router
+    // 添加路由接口
     size_t add_interface(AsyncNetworkInterface &&interface) {
         _interfaces.push_back(std::move(interface));
         return _interfaces.size() - 1;
