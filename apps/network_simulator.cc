@@ -10,6 +10,7 @@ using namespace std;
 
 auto rd = get_random_generator();
 
+// 为主机随机生成一个MAC地址
 EthernetAddress random_host_ethernet_address() {
     EthernetAddress addr;
     for (auto &byte : addr) {

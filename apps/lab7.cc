@@ -14,6 +14,7 @@ using namespace std;
 
 auto rd = get_random_generator();
 
+// 随机生成本机的MAC地址
 EthernetAddress random_host_ethernet_address() {
     EthernetAddress addr;
     for (auto &byte : addr) {
@@ -25,6 +26,7 @@ EthernetAddress random_host_ethernet_address() {
     return addr;
 }
 
+// 随机生成路由器的MAC地址
 EthernetAddress random_router_ethernet_address() {
     EthernetAddress addr;
     for (auto &byte : addr) {
@@ -70,12 +72,17 @@ string summary(const EthernetFrame &frame) {
     return ret;
 }
 
+// 为了适配从通道读写IP数据报
 class NetworkInterfaceAdapter : public TCPOverIPv4Adapter {
   private:
+    // 获取网络接口、下一跳
     NetworkInterface _interface;
     Address _next_hop;
+    // socket_pair系统调用创建出来的本地套接字双向通信通道 --> lab five的测试文件中,这里是写死为Tap设备
+    // 但是此处我们利用双向通道进行解耦,这样数据可以来源于Tap设备,也可以来源于其他地方 -- 解耦
     pair<FileDescriptor, FileDescriptor> _data_socket_pair = socket_pair_helper(SOCK_DGRAM);
 
+    // 将网络接口输出队列中等待输出的以太网帧取出,然后写入双向通信通道中
     void send_pending() {
         while (not _interface.frames_out().empty()) {
             _data_socket_pair.first.write(_interface.frames_out().front().serialize());

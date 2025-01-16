@@ -48,6 +48,7 @@ class Socket : public FileDescriptor {
 };
 
 //! A wrapper around [UDP sockets](\ref man7::udp)
+// 对本机Linux网络子系统提供的UDP socket进行的包装
 class UDPSocket : public Socket {
   protected:
     //! \brief Construct from FileDescriptor (used by TCPOverUDPSocketAdapter)
@@ -56,9 +57,11 @@ class UDPSocket : public Socket {
 
   public:
     //! Default: construct an unbound, unconnected UDP socket
+    // 无参数构造，默认是udp socket
     UDPSocket() : Socket(AF_INET, SOCK_DGRAM) {}
 
     //! Returned by UDPSocket::recv; carries received data and information about the sender
+    // recv接收UDP数据报方法返回结果的结构体
     struct received_datagram {
         Address source_address;  //!< Address from which this datagram was received
         std::string payload;     //!< UDP datagram payload
